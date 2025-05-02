@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="border-b">
-        <div className="container flex items-center justify-between py-4">
+        <div className="container mx-auto flex items-center justify-between py-4">
           <div className="flex items-center gap-2">
             <Car className="h-6 w-6" />
             <span className="text-xl font-bold">TowMe</span>
@@ -37,7 +37,7 @@ export default function Home() {
       </header>
       <main>
         <section className="py-20 bg-gradient-to-b from-muted/50 to-background">
-          <div className="container flex flex-col items-center text-center">
+          <div className="container mx-auto flex flex-col items-center text-center">
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">Fast & Reliable Car Towing Service</h1>
             <p className="text-xl text-muted-foreground max-w-[800px] mb-10">
               Request a tow truck with just a few clicks. We'll connect you with the nearest available tower to get you
@@ -59,7 +59,7 @@ export default function Home() {
         </section>
 
         <section id="services" className="py-20">
-          <div className="container">
+          <div className="container mx-auto">
             <h2 className="text-3xl font-bold text-center mb-12">Our Services</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="flex flex-col items-center text-center p-6 rounded-lg border bg-card">
@@ -90,7 +90,7 @@ export default function Home() {
         </section>
 
         <section id="how-it-works" className="py-20 bg-muted/30">
-          <div className="container">
+          <div className="container mx-auto">
             <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="flex flex-col items-center text-center">
@@ -123,7 +123,7 @@ export default function Home() {
         </section>
       </main>
       <footer className="mt-auto border-t py-8">
-        <div className="container flex flex-col md:flex-row justify-between items-center">
+        <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center gap-2 mb-4 md:mb-0">
             <Car className="h-5 w-5" />
             <span className="font-bold">TowMe</span>

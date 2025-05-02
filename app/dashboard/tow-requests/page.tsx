@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -12,9 +18,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { useToast } from "@/components/ui/use-toast"
-import { Car, Check, Clock, MapPin, X } from "lucide-react"
+} from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
+import { Car, Check, Clock, MapPin, X } from "lucide-react";
 
 // Mock data for tow requests
 const towRequests = [
@@ -123,124 +129,164 @@ const towRequests = [
     estimatedArrivalTime: "2023-04-30T16:15:00",
     actualCompletionTime: "2023-04-30T16:45:00",
   },
-]
+];
 
 export default function TowRequestsPage() {
-  const [requests, setRequests] = useState(towRequests)
-  const [selectedRequest, setSelectedRequest] = useState(null)
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false)
-  const { toast } = useToast()
+  const [requests, setRequests] = useState(towRequests);
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const { toast } = useToast();
 
   const getStatusBadge = (status) => {
     switch (status) {
       case "PENDING":
         return (
-          <Badge variant="outline" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
+          <Badge
+            variant="outline"
+            className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
+          >
             Pending
           </Badge>
-        )
+        );
       case "ASSIGNED":
         return (
-          <Badge variant="outline" className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+          <Badge
+            variant="outline"
+            className="bg-blue-100 text-blue-800 hover:bg-blue-100"
+          >
             Assigned
           </Badge>
-        )
+        );
       case "ACCEPTED":
         return (
-          <Badge variant="outline" className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+          <Badge
+            variant="outline"
+            className="bg-blue-100 text-blue-800 hover:bg-blue-100"
+          >
             Accepted
           </Badge>
-        )
+        );
       case "IN_PROGRESS":
         return (
-          <Badge variant="outline" className="bg-purple-100 text-purple-800 hover:bg-purple-100">
+          <Badge
+            variant="outline"
+            className="bg-purple-100 text-purple-800 hover:bg-purple-100"
+          >
             In Progress
           </Badge>
-        )
+        );
       case "COMPLETED":
         return (
-          <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">
+          <Badge
+            variant="outline"
+            className="bg-green-100 text-green-800 hover:bg-green-100"
+          >
             Completed
           </Badge>
-        )
+        );
       case "CANCELLED":
         return (
-          <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-100">
+          <Badge
+            variant="outline"
+            className="bg-red-100 text-red-800 hover:bg-red-100"
+          >
             Cancelled
           </Badge>
-        )
+        );
       case "REJECTED":
         return (
-          <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-100">
+          <Badge
+            variant="outline"
+            className="bg-red-100 text-red-800 hover:bg-red-100"
+          >
             Rejected
           </Badge>
-        )
+        );
       default:
-        return <Badge variant="outline">{status}</Badge>
+        return <Badge variant="outline">{status}</Badge>;
     }
-  }
+  };
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString)
-    return date.toLocaleString()
-  }
+    const date = new Date(dateString);
+    return date.toLocaleString();
+  };
 
   const viewRequestDetails = (request) => {
-    setSelectedRequest(request)
-    setIsDetailsOpen(true)
-  }
+    setSelectedRequest(request);
+    setIsDetailsOpen(true);
+  };
 
   const acceptRequest = (id) => {
     // In a real app, this would call an API to accept the request
     const updatedRequests = requests.map((req) =>
       req.id === id
-        ? { ...req, status: "ACCEPTED", estimatedArrivalTime: new Date(Date.now() + 30 * 60000).toISOString() }
-        : req,
-    )
-    setRequests(updatedRequests)
+        ? {
+            ...req,
+            status: "ACCEPTED",
+            estimatedArrivalTime: new Date(
+              Date.now() + 30 * 60000
+            ).toISOString(),
+          }
+        : req
+    );
+    setRequests(updatedRequests);
     toast({
       title: "Request accepted",
-      description: "You have accepted the tow request. Please proceed to the pickup location.",
-    })
-  }
+      description:
+        "You have accepted the tow request. Please proceed to the pickup location.",
+    });
+  };
 
   const rejectRequest = (id) => {
     // In a real app, this would call an API to reject the request
-    const updatedRequests = requests.map((req) => (req.id === id ? { ...req, status: "REJECTED" } : req))
-    setRequests(updatedRequests)
+    const updatedRequests = requests.map((req) =>
+      req.id === id ? { ...req, status: "REJECTED" } : req
+    );
+    setRequests(updatedRequests);
     toast({
       title: "Request rejected",
       description: "You have rejected the tow request.",
-    })
-  }
+    });
+  };
 
   const startTow = (id) => {
     // In a real app, this would call an API to start the tow
-    const updatedRequests = requests.map((req) => (req.id === id ? { ...req, status: "IN_PROGRESS" } : req))
-    setRequests(updatedRequests)
+    const updatedRequests = requests.map((req) =>
+      req.id === id ? { ...req, status: "IN_PROGRESS" } : req
+    );
+    setRequests(updatedRequests);
     toast({
       title: "Tow started",
       description: "You have started the tow. Safe driving!",
-    })
-  }
+    });
+  };
 
   const completeTow = (id) => {
     // In a real app, this would call an API to complete the tow
     const updatedRequests = requests.map((req) =>
-      req.id === id ? { ...req, status: "COMPLETED", actualCompletionTime: new Date().toISOString() } : req,
-    )
-    setRequests(updatedRequests)
+      req.id === id
+        ? {
+            ...req,
+            status: "COMPLETED",
+            actualCompletionTime: new Date().toISOString(),
+          }
+        : req
+    );
+    setRequests(updatedRequests);
     toast({
       title: "Tow completed",
       description: "You have completed the tow successfully.",
-    })
-  }
+    });
+  };
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Tow Requests</h1>
-        <p className="text-muted-foreground">Manage incoming tow requests and active tows</p>
+        <p className="text-muted-foreground">
+          Manage incoming tow requests and active tows
+        </p>
       </div>
 
       <Tabs defaultValue="pending">
@@ -266,8 +312,12 @@ export default function TowRequestsPage() {
           {requests.filter((req) => req.status === "PENDING").length === 0 && (
             <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
               <Clock className="h-10 w-10 text-muted-foreground" />
-              <h3 className="mt-4 text-lg font-semibold">No pending requests</h3>
-              <p className="mt-2 text-sm text-muted-foreground">There are no pending tow requests at the moment.</p>
+              <h3 className="mt-4 text-lg font-semibold">
+                No pending requests
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                There are no pending tow requests at the moment.
+              </p>
             </div>
           )}
         </TabsContent>
@@ -286,8 +336,12 @@ export default function TowRequestsPage() {
           {requests.filter((req) => req.status === "ACCEPTED").length === 0 && (
             <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
               <Clock className="h-10 w-10 text-muted-foreground" />
-              <h3 className="mt-4 text-lg font-semibold">No accepted requests</h3>
-              <p className="mt-2 text-sm text-muted-foreground">You haven't accepted any tow requests yet.</p>
+              <h3 className="mt-4 text-lg font-semibold">
+                No accepted requests
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                You haven't accepted any tow requests yet.
+              </p>
             </div>
           )}
         </TabsContent>
@@ -303,11 +357,14 @@ export default function TowRequestsPage() {
                 showCompleteButton={true}
               />
             ))}
-          {requests.filter((req) => req.status === "IN_PROGRESS").length === 0 && (
+          {requests.filter((req) => req.status === "IN_PROGRESS").length ===
+            0 && (
             <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
               <Clock className="h-10 w-10 text-muted-foreground" />
               <h3 className="mt-4 text-lg font-semibold">No active tows</h3>
-              <p className="mt-2 text-sm text-muted-foreground">You don't have any tows in progress.</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                You don't have any tows in progress.
+              </p>
             </div>
           )}
         </TabsContent>
@@ -315,13 +372,20 @@ export default function TowRequestsPage() {
           {requests
             .filter((req) => req.status === "COMPLETED")
             .map((request) => (
-              <RequestCard key={request.id} request={request} onViewDetails={viewRequestDetails} />
+              <RequestCard
+                key={request.id}
+                request={request}
+                onViewDetails={viewRequestDetails}
+              />
             ))}
-          {requests.filter((req) => req.status === "COMPLETED").length === 0 && (
+          {requests.filter((req) => req.status === "COMPLETED").length ===
+            0 && (
             <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
               <Clock className="h-10 w-10 text-muted-foreground" />
               <h3 className="mt-4 text-lg font-semibold">No completed tows</h3>
-              <p className="mt-2 text-sm text-muted-foreground">You haven't completed any tows yet.</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                You haven't completed any tows yet.
+              </p>
             </div>
           )}
         </TabsContent>
@@ -332,7 +396,9 @@ export default function TowRequestsPage() {
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>Request Details</DialogTitle>
-              <DialogDescription>Detailed information about the tow request</DialogDescription>
+              <DialogDescription>
+                Detailed information about the tow request
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -355,9 +421,12 @@ export default function TowRequestsPage() {
                   <div>
                     <p className="text-sm font-medium">Vehicle</p>
                     <p className="text-sm text-muted-foreground">
-                      {selectedRequest.car.make} {selectedRequest.car.model} ({selectedRequest.car.year})
+                      {selectedRequest.car.make} {selectedRequest.car.model} (
+                      {selectedRequest.car.year})
                     </p>
-                    <p className="text-sm text-muted-foreground">License Plate: {selectedRequest.car.licensePlate}</p>
+                    <p className="text-sm text-muted-foreground">
+                      License Plate: {selectedRequest.car.licensePlate}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -370,16 +439,24 @@ export default function TowRequestsPage() {
                 <div className="space-y-2">
                   <div>
                     <p className="text-sm font-medium">Pickup</p>
-                    <p className="text-sm text-muted-foreground">{selectedRequest.pickupLocation}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedRequest.pickupLocation}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm font-medium">Destination</p>
-                    <p className="text-sm text-muted-foreground">{selectedRequest.destination}</p>
-                    <p className="text-sm text-muted-foreground">{selectedRequest.destinationAddress}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedRequest.destination}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedRequest.destinationAddress}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm font-medium">Distance</p>
-                    <p className="text-sm text-muted-foreground">{selectedRequest.distance} miles</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedRequest.distance} miles
+                    </p>
                   </div>
                 </div>
               </div>
@@ -392,7 +469,9 @@ export default function TowRequestsPage() {
                 <div className="space-y-2">
                   <div>
                     <p className="text-sm font-medium">Request Time</p>
-                    <p className="text-sm text-muted-foreground">{formatDate(selectedRequest.requestTime)}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {formatDate(selectedRequest.requestTime)}
+                    </p>
                   </div>
                   {selectedRequest.estimatedArrivalTime && (
                     <div>
@@ -412,12 +491,16 @@ export default function TowRequestsPage() {
                   )}
                   <div>
                     <p className="text-sm font-medium">Estimated Cost</p>
-                    <p className="text-sm text-muted-foreground">${selectedRequest.estimatedCost.toFixed(2)}</p>
+                    <p className="text-sm text-muted-foreground">
+                      ${selectedRequest.estimatedCost.toFixed(2)}
+                    </p>
                   </div>
                   {selectedRequest.actualCost && (
                     <div>
                       <p className="text-sm font-medium">Final Cost</p>
-                      <p className="text-sm text-muted-foreground">${selectedRequest.actualCost.toFixed(2)}</p>
+                      <p className="text-sm text-muted-foreground">
+                        ${selectedRequest.actualCost.toFixed(2)}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -429,16 +512,16 @@ export default function TowRequestsPage() {
                   <Button
                     variant="destructive"
                     onClick={() => {
-                      rejectRequest(selectedRequest.id)
-                      setIsDetailsOpen(false)
+                      rejectRequest(selectedRequest.id);
+                      setIsDetailsOpen(false);
                     }}
                   >
                     Reject
                   </Button>
                   <Button
                     onClick={() => {
-                      acceptRequest(selectedRequest.id)
-                      setIsDetailsOpen(false)
+                      acceptRequest(selectedRequest.id);
+                      setIsDetailsOpen(false);
                     }}
                   >
                     Accept
@@ -448,8 +531,8 @@ export default function TowRequestsPage() {
               {selectedRequest.status === "ACCEPTED" && (
                 <Button
                   onClick={() => {
-                    startTow(selectedRequest.id)
-                    setIsDetailsOpen(false)
+                    startTow(selectedRequest.id);
+                    setIsDetailsOpen(false);
                   }}
                 >
                   Start Tow
@@ -458,8 +541,8 @@ export default function TowRequestsPage() {
               {selectedRequest.status === "IN_PROGRESS" && (
                 <Button
                   onClick={() => {
-                    completeTow(selectedRequest.id)
-                    setIsDetailsOpen(false)
+                    completeTow(selectedRequest.id);
+                    setIsDetailsOpen(false);
                   }}
                 >
                   Complete Tow
@@ -473,7 +556,7 @@ export default function TowRequestsPage() {
         </Dialog>
       )}
     </div>
-  )
+  );
 }
 
 function RequestCard({
@@ -488,58 +571,79 @@ function RequestCard({
   showCompleteButton,
 }) {
   const formatDate = (dateString) => {
-    const date = new Date(dateString)
-    return date.toLocaleString()
-  }
+    const date = new Date(dateString);
+    return date.toLocaleString();
+  };
 
   const getStatusBadge = (status) => {
     switch (status) {
       case "PENDING":
         return (
-          <Badge variant="outline" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
+          <Badge
+            variant="outline"
+            className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
+          >
             Pending
           </Badge>
-        )
+        );
       case "ASSIGNED":
         return (
-          <Badge variant="outline" className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+          <Badge
+            variant="outline"
+            className="bg-blue-100 text-blue-800 hover:bg-blue-100"
+          >
             Assigned
           </Badge>
-        )
+        );
       case "ACCEPTED":
         return (
-          <Badge variant="outline" className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+          <Badge
+            variant="outline"
+            className="bg-blue-100 text-blue-800 hover:bg-blue-100"
+          >
             Accepted
           </Badge>
-        )
+        );
       case "IN_PROGRESS":
         return (
-          <Badge variant="outline" className="bg-purple-100 text-purple-800 hover:bg-purple-100">
+          <Badge
+            variant="outline"
+            className="bg-purple-100 text-purple-800 hover:bg-purple-100"
+          >
             In Progress
           </Badge>
-        )
+        );
       case "COMPLETED":
         return (
-          <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">
+          <Badge
+            variant="outline"
+            className="bg-green-100 text-green-800 hover:bg-green-100"
+          >
             Completed
           </Badge>
-        )
+        );
       case "CANCELLED":
         return (
-          <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-100">
+          <Badge
+            variant="outline"
+            className="bg-red-100 text-red-800 hover:bg-red-100"
+          >
             Cancelled
           </Badge>
-        )
+        );
       case "REJECTED":
         return (
-          <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-100">
+          <Badge
+            variant="outline"
+            className="bg-red-100 text-red-800 hover:bg-red-100"
+          >
             Rejected
           </Badge>
-        )
+        );
       default:
-        return <Badge variant="outline">{status}</Badge>
+        return <Badge variant="outline">{status}</Badge>;
     }
-  }
+  };
 
   return (
     <Card>
@@ -558,28 +662,40 @@ function RequestCard({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <p className="text-sm font-medium">Pickup Location</p>
-            <p className="text-sm text-muted-foreground">{request.pickupLocation}</p>
+            <p className="text-sm text-muted-foreground">
+              {request.pickupLocation}
+            </p>
           </div>
           <div>
             <p className="text-sm font-medium">Destination</p>
-            <p className="text-sm text-muted-foreground">{request.destination}</p>
+            <p className="text-sm text-muted-foreground">
+              {request.destination}
+            </p>
           </div>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-4">
           <div>
             <p className="text-sm font-medium">Distance</p>
-            <p className="text-sm text-muted-foreground">{request.distance} miles</p>
+            <p className="text-sm text-muted-foreground">
+              {request.distance} miles
+            </p>
           </div>
           <div>
             <p className="text-sm font-medium">Estimated Cost</p>
-            <p className="text-sm text-muted-foreground">${request.estimatedCost.toFixed(2)}</p>
+            <p className="text-sm text-muted-foreground">
+              ${request.estimatedCost.toFixed(2)}
+            </p>
           </div>
         </div>
       </CardContent>
       <div className="flex items-center justify-end gap-2 p-4 pt-0">
         {showActions && (
           <>
-            <Button variant="destructive" size="sm" onClick={() => onReject(request.id)}>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => onReject(request.id)}
+            >
               <X className="mr-2 h-4 w-4" />
               Reject
             </Button>
@@ -599,10 +715,14 @@ function RequestCard({
             Complete Tow
           </Button>
         )}
-        <Button variant="outline" size="sm" onClick={() => onViewDetails(request)}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onViewDetails(request)}
+        >
           View Details
         </Button>
       </div>
     </Card>
-  )
+  );
 }

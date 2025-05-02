@@ -17,13 +17,18 @@ import { useToast } from "@/components/ui/use-toast";
 import { MapPin, Car, Building, ArrowRight, Plus } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import type { Location } from "@/lib/database";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 
 import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import shadowUrl from "leaflet/dist/images/marker-shadow.png";
+
+type Location = {
+  latitude: number;
+  longitude: number;
+  addressString: string;
+};
 
 // Mock data for cars
 const userCars = [
@@ -86,6 +91,8 @@ function LocationPicker({ pickupLocation, setPickupLocation }) {
     ></Marker>
   ) : null;
 }
+
+
 
 export default function RequestTowPage() {
   const [selectedCar, setSelectedCar] = useState("");

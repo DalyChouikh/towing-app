@@ -7,31 +7,15 @@ export async function GET(request: NextRequest) {
     const id = url.searchParams.get("id")
 
     if (id) {
-      const user = getUserById(id)
+      const user = await getUserById(id)
       if (!user) {
         return NextResponse.json({ error: "User not found" }, { status: 404 })
       }
-      return NextResponse.json({ user })
+      const { passwordHash, ...userWithoutPassword } = user
+      return NextResponse.json({ user: userWithoutPassword })
     }
 
-    // In a real app, you would implement pagination and filtering
-    // For demo purposes, we'll return a mock response
-    return NextResponse.json({
-      users: [
-        {
-          id: "user-1",
-          name: "John Doe",
-          email: "john.doe@example.com",
-          role: "USER",
-        },
-        {
-          id: "user-2",
-          name: "Jane Smith",
-          email: "jane.smith@example.com",
-          role: "TOWER",
-        },
-      ],
-    })
+    return NextResponse.json({ message: "Fetching all users not implemented without pagination. Provide an ID." }, { status: 400 })
   } catch (error) {
     console.error("Error fetching users:", error)
     return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 })
@@ -42,18 +26,24 @@ export async function POST(request: NextRequest) {
   try {
     const userData = await request.json()
 
-    // In a real app, you would validate the input data
+    if (!userData.email || !userData.password || !userData.name) {
+      return NextResponse.json({ error: "Missing required fields (name, email, password)" }, { status: 400 })
+    }
 
-    const newUser = createUser({
+    const newUser = await createUser({
       name: userData.name,
       email: userData.email,
-      phoneNumber: userData.phoneNumber || "",
-      passwordHash: "hashed_password", // In a real app, you would hash the password
+      phoneNumber: userData.phoneNumber,
+      passwordHash: userData.password,
       role: userData.role || "USER",
     })
 
-    return NextResponse.json({ user: newUser }, { status: 201 })
+    const { passwordHash, ...userWithoutPassword } = newUser
+    return NextResponse.json({ user: userWithoutPassword }, { status: 201 })
   } catch (error) {
+    if (error.code === "P2002" && error.meta?.target?.includes("email")) {
+      return NextResponse.json({ error: "Email already exists" }, { status: 409 })
+    }
     console.error("Error creating user:", error)
     return NextResponse.json({ error: "Failed to create user" }, { status: 500 })
   }
@@ -61,19 +51,25 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { id, ...updates } = await request.json()
+    const url = new URL(request.url)
+    const id = url.searchParams.get("id")
+    const updates = await request.json()
 
     if (!id) {
-      return NextResponse.json({ error: "User ID is required" }, { status: 400 })
+      return NextResponse.json({ error: "User ID is required in URL path or query param" }, { status: 400 })
     }
 
-    const updatedUser = updateUser(id, updates)
+    delete updates.password
+    delete updates.passwordHash
+
+    const updatedUser = await updateUser(id, updates)
 
     if (!updatedUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 })
+      return NextResponse.json({ error: "User not found or update failed" }, { status: 404 })
     }
 
-    return NextResponse.json({ user: updatedUser })
+    const { passwordHash, ...userWithoutPassword } = updatedUser
+    return NextResponse.json({ user: userWithoutPassword })
   } catch (error) {
     console.error("Error updating user:", error)
     return NextResponse.json({ error: "Failed to update user" }, { status: 500 })
@@ -89,13 +85,13 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "User ID is required" }, { status: 400 })
     }
 
-    const success = deleteUser(id)
+    const deletedUser = await deleteUser(id)
 
-    if (!success) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 })
+    if (!deletedUser) {
+      return NextResponse.json({ error: "User not found or deletion failed" }, { status: 404 })
     }
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, message: `User ${id} deleted` })
   } catch (error) {
     console.error("Error deleting user:", error)
     return NextResponse.json({ error: "Failed to delete user" }, { status: 500 })

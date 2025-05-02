@@ -1,0 +1,161 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma" // Keep the custom output path
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum Role {
+  ADMIN
+  USER
+  TOWER
+  REPAIRER
+  ASSURANCE_REP
+  AGENCY_REP
+}
+
+enum TowRequestStatus {
+  PENDING
+  ASSIGNED
+  ACCEPTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  REJECTED
+}
+
+enum TowerAvailabilityStatus {
+  AVAILABLE
+  BUSY
+  OFFLINE
+}
+
+enum DestinationType {
+  RepairShop
+  CarAgency
+  AssuranceCompany
+}
+
+// Models
+model User {
+  userID      String  @id @default(uuid())
+  name        String
+  email       String  @unique
+  phoneNumber String?
+  passwordHash String
+  role        Role    @default(USER)
+
+  cars         Car[]
+  towRequests  TowRequest[]
+  towers       Tower[]       @relation("UserTowers") // Relation for tower profile linked to user
+  destinations Destination[] // Destinations managed by this user
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Car {
+  carID        String @id @default(uuid())
+  make         String
+  model        String
+  year         Int
+  vin          String @unique
+  licensePlate String @unique
+  color        String
+
+  user   User   @relation(fields: [userID], references: [userID])
+  userID String
+
+  towRequests TowRequest[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Using Json type for Location for simplicity
+// Alternatively, create a separate Location model and relate it
+// model Location {
+//   locationID String @id @default(uuid())
+//   latitude   Float
+//   longitude  Float
+//   addressString String
+//   // Add relations if needed
+// }
+
+model TowRequest {
+  requestID String           @id @default(uuid())
+  requestTime DateTime         @default(now())
+  status    TowRequestStatus @default(PENDING)
+
+  pickupLocation Json // Store Location object as JSON { latitude: float, longitude: float, addressString: string }
+
+  estimatedCost        Float?
+  actualCost           Float?
+  estimatedArrivalTime DateTime?
+  actualCompletionTime DateTime?
+  notes                String?
+
+  user   User   @relation(fields: [userID], references: [userID])
+  userID String
+
+  car   Car    @relation(fields: [carID], references: [carID])
+  carID String
+
+  destination   Destination @relation(fields: [destinationID], references: [destinationID])
+  destinationID String
+
+  tower   Tower?  @relation(fields: [towerID], references: [towerID])
+  towerID String? // Optional: Assigned later
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Tower {
+  towerID        String                  @id @default(uuid())
+  companyName    String
+  driverName     String
+  contactNumber  String
+  vehicleDetails String
+  availability   TowerAvailabilityStatus @default(OFFLINE)
+  serviceArea    String?
+  serviceDescription String?
+  rates          Json? // Store rates object as JSON { baseRate: float, perMileRate: float, afterHoursRate: float }
+
+  // Using Json type for Location for simplicity
+  currentLocation Json? // Store Location object as JSON { latitude: float, longitude: float, addressString: string }
+
+  user   User   @relation("UserTowers", fields: [userID], references: [userID])
+  userID String @unique // Each tower profile belongs to one user
+
+  assignedRequests TowRequest[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Destination {
+  destinationID String          @id @default(uuid())
+  type          DestinationType
+  name          String
+  phoneNumber   String?
+  operatingHours String?
+
+  // Using Json type for Location for simplicity
+  location Json // Store Location object as JSON { latitude: float, longitude: float, addressString: string }
+
+  user   User   @relation(fields: [userID], references: [userID])
+  userID String // The user who manages this destination (e.g., repairer, agency rep)
+
+  incomingTowRequests TowRequest[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

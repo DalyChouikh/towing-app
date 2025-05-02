@@ -1,29 +1,34 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getUserByEmail } from "@/lib/database"
+import bcrypt from 'bcrypt'; // Import bcrypt
 
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json()
 
-    // In a real app, you would validate the email and password
-    // and check against a real database
+    // Basic input validation
+    if (!email || !password) {
+      return NextResponse.json({ error: "Email and password are required" }, { status: 400 })
+    }
 
-    // For demo purposes, we'll use our mock database
-    const user = getUserByEmail(email)
+    const user = await getUserByEmail(email); // Await the async function
 
     if (!user) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
     }
 
-    // In a real app, you would verify the password hash
-    // For demo purposes, we'll skip that step
+    // --- Real Password Check ---
+    const isPasswordValid = await bcrypt.compare(password, user.passwordHash); // Use bcrypt.compare
 
-    // Create a session or token
-    // In a real app, you would use a proper authentication library
+    if (!isPasswordValid) {
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
+    }
+    // --- End Real Password Check ---
 
+    // Return user data (excluding password hash)
     return NextResponse.json({
       user: {
-        id: user.userID,
+        id: user.userID, // Use userID here
         name: user.name,
         email: user.email,
         role: user.role,
